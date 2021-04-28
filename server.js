@@ -10,6 +10,10 @@ const PORT = process.env.PORT || 3001;
 // Serves index.html
 noteApp.get('/', (req, res) => res.sendFile(path.join(__dirname, "/public/index.html")));
 
+noteApp.get('/notes/styles.css', (req, res) => res.sendFile(path.join(__dirname, "/public/assets/css/styles.css")));
+
+noteApp.get('/index.js', (req, res) => res.sendFile(path.join(__dirname, "/public/assets/js/index.js")));
+
 // Serves notes.html
 noteApp.get('/notes', (req, res) => res.sendFile(path.join(__dirname, "/public/notes.html")));
 
