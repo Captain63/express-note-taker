@@ -1,6 +1,7 @@
 // Import dependencies
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 
 // Initialize express app
 const noteApp = express();
@@ -16,6 +17,13 @@ noteApp.get('/index.js', (req, res) => res.sendFile(path.join(__dirname, "/publi
 
 // Serves notes.html
 noteApp.get('/notes', (req, res) => res.sendFile(path.join(__dirname, "/public/notes.html")));
+
+// Route handling for API requests
+// Serves existing notes
+noteApp.get("/api/notes", (req, res) => {
+    fs.readFile("./db/db.json")
+    .then(response => response.json());
+})
 
 // Launch server to begin listening for requests
 noteApp.listen(PORT, () => console.log(`App listening on PORT ${PORT}`));
