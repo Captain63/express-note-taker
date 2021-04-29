@@ -3,6 +3,7 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const shortid = require("shortid");
+const nodemon = require("nodemon");
 
 // Initialize express app
 const noteApp = express();
@@ -16,15 +17,13 @@ noteApp.use(express.json());
 noteApp.get('/', (req, res) => res.sendFile(path.join(__dirname, "/public/index.html")));
 
 // Serves CSS file for Notes page
-noteApp.get('/notes/styles.css', (req, res) => res.sendFile(path.join(__dirname, "/public/assets/css/styles.css")));
+noteApp.get('/assets/css/styles.css', (req, res) => res.sendFile(path.join(__dirname, "/public/assets/css/styles.css")));
 
 // Serves index.js file for Notes page
-noteApp.get('/index.js', (req, res) => res.sendFile(path.join(__dirname, "/public/assets/js/index.js")));
+noteApp.get('/assets/js/index.js', (req, res) => res.sendFile(path.join(__dirname, "/public/assets/js/index.js")));
 
 // Serves notes.html
 noteApp.get('/notes', (req, res) => res.sendFile(path.join(__dirname, "/public/notes.html")));
-
-let currentNotes;
 
 // Route handling for API requests
 // Serves existing notes from db.json
@@ -33,9 +32,6 @@ noteApp.get('/api/notes', (req, res) => {
         if (error) {
             console.error(error);
         } else {
-            
-            currentNotes = JSON.parse(data);
-
             // Sends response without converting to JSON since file format is already JSON
             return res.send(data);
         }
@@ -44,21 +40,46 @@ noteApp.get('/api/notes', (req, res) => {
 
 // Accepts new note submissions
 noteApp.post('/api/notes', (req, res) => {
-    const newNote = req.body;
 
-    // Assigns id property to newNote object
-    newNote._id = shortid.generate();
+    fs.readFile("./db/db.json", 'utf8', (error, data) => {
+        if (error) {
+            console.error(error);
+        } else {
+            const currentNotes = JSON.parse(data);
+
+            const newNote = req.body;
+
+            // Assigns id property to newNote object
+            newNote.id = shortid.generate();
+            
+            const updatedNotes = currentNotes.map(note => note);
+            updatedNotes.push(newNote);
+
+            // Overwrite db.json file with updatedNotes array
+            fs.writeFile("./db/db.json", JSON.stringify(updatedNotes), (err) => err ? console.error(err) : console.log("Note saved"));
+
+            res.json(newNote);
+        }
+    })
+});
+
+noteApp.delete('/api/notes/:id', (req, res) => {
+
+    const deletedNote = req.params.id;
     
-    // Clones current notes array
-    const updatedNotes = currentNotes.map(note => note);
+    fs.readFile('./db/db.json', 'utf8', (error, data) => {
+        if (error) {
+            console.error(error);
+        } else {
+            const currentNotes = JSON.parse(data);
 
-    // Adds newNote object to array
-    updatedNotes.push(newNote);
-    
-    // Overwrite db.json file with updatedNotes array
-    fs.writeFile("./db/db.json", JSON.stringify(updatedNotes), (err) => err ? console.error(err) : console.log("Note saved"));
+            const updatedNotes = currentNotes.filter(note => note.id !== deletedNote);
 
-    res.json(newNote);
+            fs.writeFile("./db/db.json", JSON.stringify(updatedNotes), (err) => err ? console.error(err) : console.log("Note deleted"));
+
+            res.json("Success");
+        }
+    })
 });
 
 // Launch server to begin listening for requests
