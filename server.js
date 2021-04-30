@@ -3,7 +3,6 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const shortid = require("shortid");
-const nodemon = require("nodemon");
 
 // Initialize express app
 const noteApp = express();
