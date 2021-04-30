@@ -22,6 +22,12 @@ noteApp.get('/assets/css/styles.css', (req, res) => res.sendFile(path.join(__dir
 // Serves index.js file for Notes page
 noteApp.get('/assets/js/index.js', (req, res) => res.sendFile(path.join(__dirname, "/public/assets/js/index.js")));
 
+// Serves favicon as .png
+noteApp.get('/assets/images/96px-pencil.png', (req, res) => res.sendFile(path.join(__dirname, "/public/assets/images/96px-pencil.png")));
+
+// Serves favicon as .svg
+noteApp.get('/assets/images/96px-pencil.svg', (req, res) => res.sendFile(path.join(__dirname, "/public/assets/images/96px-pencil.svg")));
+
 // Serves notes.html
 noteApp.get('/notes', (req, res) => res.sendFile(path.join(__dirname, "/public/notes.html")));
 
