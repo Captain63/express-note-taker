@@ -8,6 +8,7 @@ const shortid = require("shortid");
 const noteApp = express();
 const PORT = process.env.PORT || 3001;
 
+// Configures app to handle data parsing
 noteApp.use(express.urlencoded({ extended: true }));
 noteApp.use(express.json());
 
@@ -40,6 +41,7 @@ noteApp.get('/api/notes', (req, res) => {
 // Accepts new note submissions
 noteApp.post('/api/notes', (req, res) => {
 
+    // Pulls existing notes from db.json file
     fs.readFile("./db/db.json", 'utf8', (error, data) => {
         if (error) {
             console.error(error);
@@ -51,7 +53,10 @@ noteApp.post('/api/notes', (req, res) => {
             // Assigns id property to newNote object
             newNote.id = shortid.generate();
             
+            // Clones array of existing notes
             const updatedNotes = currentNotes.map(note => note);
+
+            // Adds new note to array to then be written to db.json
             updatedNotes.push(newNote);
 
             // Overwrite db.json file with updatedNotes array
@@ -64,16 +69,20 @@ noteApp.post('/api/notes', (req, res) => {
 
 noteApp.delete('/api/notes/:id', (req, res) => {
 
+    // Assigns requested id to variable
     const deletedNote = req.params.id;
     
+    // Pulls existing notes from db.json file
     fs.readFile('./db/db.json', 'utf8', (error, data) => {
         if (error) {
             console.error(error);
         } else {
             const currentNotes = JSON.parse(data);
 
+            // Creates new array from existing notes array of all notes EXCEPT the note whose id matches the parameter
             const updatedNotes = currentNotes.filter(note => note.id !== deletedNote);
 
+            // Overwites db.json file with array of notes minus deleted note
             fs.writeFile("./db/db.json", JSON.stringify(updatedNotes), (err) => err ? console.error(err) : console.log("Note deleted"));
 
             res.json("Success");
