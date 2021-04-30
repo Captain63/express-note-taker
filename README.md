@@ -3,7 +3,7 @@
 
 ## Table of Contents
 - [Project Overview](#project-overview) 
-- [Live Application](#installation)
+- [Live Application](#live-application)
 - [License](#license)
 - [Screenshots](#screenshots)
 
